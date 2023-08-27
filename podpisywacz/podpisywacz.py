@@ -74,6 +74,12 @@ while(True):
 
         signature = generateSignature(privateKey, filePath)
 
+        print("Podaj ścieżkę do którego pliku wygenerować podpis: ")
+        signatureFilePath = input()
+
+        with open(signatureFilePath, 'x') as sigFile:
+            sigFile.write(signature.hex());
+
         if(signature): 
             print(Fore.YELLOW + "Podpisano plik \n")
         else:
@@ -86,9 +92,21 @@ while(True):
         print("Podaj ścieżkę klucza: ")
         pubKeyFilePath = input()
 
+        signature = None
+
+        print("Podaj ścieżkę pliku z podpisem: ")
+        signatureFilePath = input()
+
         try:
-          publicKey = loadKeyFromFile(pubKeyFilePath)
-          isAuthentic = verifySignature(publicKey, filePath, signature)
+            with open(signatureFilePath) as sigFile:
+                signature = sigFile.read();
+        except:
+            signature = None
+
+        try:
+            publicKey = loadKeyFromFile(pubKeyFilePath)
+            signature = bytes.fromhex(signature)
+            isAuthentic = verifySignature(publicKey, filePath, signature)
         except: 
             print(Fore.RED + "Nie znaleziono któregoś z plików \n")
             continue
